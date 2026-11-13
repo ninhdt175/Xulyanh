@@ -1,0 +1,16 @@
+{
+  "image_source": "skimage.data.coins",
+  "parameters": {
+    "threshold": null,
+    "radius": 2,
+    "peak_fraction": 0.45
+  },
+  "stage_images": {
+    "input": "artifacts\\real\\real_input.png",
+    "binary_mask": "artifacts\\real\\real_binary_mask.png",
+    "distance_map": "artifacts\\real\\real_distance_map.png",
+    "markers": "artifacts\\real\\real_markers.png",
+    "labels": "artifacts\\real\\real_labels.png",
+    "overlay": "artifacts\\real\\real_overlay.png"
+  }
+}

@@ -1,0 +1,72 @@
+Nhóm 1: Nhóm của tôi (Số 1 là tôi)
++-----+-------------+-------------+------+--------------------------+--------------------------------------------------------------+
+| STT | Mã sinh viên| Họ lót      | Tên  | Nhóm 1-15 (4 bạn 1 nhóm) | Chủ đề                                                       |
++-----+-------------+-------------+------+--------------------------+--------------------------------------------------------------+
+| 1   | B23DCCN381  | Đinh Viết   | Huy  | 1                        | Phân đoạn đối tượng bằng hình thái học toán học và Watershed |
++-----+-------------+-------------+------+--------------------------+                                                              |
+| 2   | B23DCCN633  | Đỗ Trọng    | Ninh | 1                        | Plugin/công cụ: MorphoLibJ                                   |
++-----+-------------+-------------+------+--------------------------+                                                              |
+| 3   | B23DCCN731  | Nguyễn Tuấn | Tài  | 1                        | Nội dung chính:                                              |
++-----+-------------+-------------+------+--------------------------+ Erosion.                                                     |
+| 4   | B23DCCN940  | Cao Xuân    | Vũ   | 1                        | Dilation.                                                    |
+|     |             |             |      |                          | Opening.                                                     |
+|     |             |             |      |                          | Closing.                                                     |
+|     |             |             |      |                          | Morphological reconstruction.                                |
+|     |             |             |      |                          | Distance transform.                                          |
+|     |             |             |      |                          | Watershed.                                                   |
+|     |             |             |      |                          | Connected components.                                        |
++-----+-------------+-------------+------+--------------------------+--------------------------------------------------------------+
+
+Yêu cầu, hướng dẫn và nộp báo cáo (mỗi nhóm chỉ 1 thành viên nộp, ghi rõ tên nhóm)
+Bài tập lớn: Nghiên cứu, cài đặt, thực nghiệm và đánh giá một thuật toán xử lý ảnh, trong đó Fiji/ImageJ được sử dụng như nền tảng tham chiếu và kiểm chứng.
+
+Nội dung: 
+
+1. Tìm hiểu lý thuyết
+
+2. Tìm hiểu, chạy code, tính toán thử, khảo sát... trên ImageJ/Fiji
+
+3. Cài đặt kiểm tra, benchmark, cải tiến... sử dụng Python
+
+Yêu cầu
+
+
+ Có trình bày nội dung thuật toán Xử lý ảnh số đủ rõ và đủ sâu.
+ Tham chiếu, trình bày về plugin tương ứng trong Fiji/ImageJ để tham khảo, học hỏi thêm kinh nghiệm từ ứng dụng đã được chuẩn hoá.
+ Các nhóm lập trình, cài đặt lại thuật toán bằng Python, Java hoặc ImageJ Macro.
+ Có thể đánh giá kết quả bằng các chỉ số định lượng (bằng cả ImageJ/Fiji và code của nhóm), không chỉ quan sát bằng mắt.
+ Trình bày quyển báo cáo (~30 trang) và presentation (~10 slides) submit link lên LMS (1 đại diện nhóm submit, ghi rõ mã nhóm)
+Điểm bài tập lớn: tính 50% vào điểm bài tập.
+
+Deadline: 19/11
+
+Chi 1 đại diện nhóm submit báo cáo trình bày đầy đủ lý thuyết, code và minh hoạ sử dụng cả ImageJ/Fiji và Python, ghi rõ mã nhóm
+
+Gợi ý phân công công việc:
+
+Thành viên 1:
+
+Nghiên cứu lý thuyết.
+Nghiên cứu tài liệu.
+Phân tích thuật toán.
+Xây dựng mô hình toán học.
+Thành viên 2:
+
+Cài đặt thuật toán bằng Python hoặc Java.
+Tối ưu chương trình.
+Kiểm thử chương trình.
+Thành viên 3:
+
+Khảo sát plugin Fiji.
+Xây dựng workflow Fiji.
+Viết ImageJ Macro hoặc script tự động.
+Thành viên 4:
+
+Chuẩn bị dataset.
+Ground truth.
+Xây dựng thí nghiệm.
+Tính metric.
+Vẽ biểu đồ và phân tích kết quả.
+
+
+

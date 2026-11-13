@@ -1,0 +1,80 @@
+{
+  "blobs": {
+    "name": "FigP1036(blobs).tif",
+    "description": "Các hình tròn dính liền nhau (Gonzalez & Woods Ch10)",
+    "stats": {
+      "num_connected_components": 46,
+      "num_watershed_objects": 89,
+      "num_markers": 89,
+      "cc_runtime_seconds": 0.0014779000011913013,
+      "ws_runtime_seconds": 0.040834600000380306,
+      "parameters": {
+        "sigma": 1.0,
+        "radius": 2,
+        "peak_fraction": 0.35,
+        "cutoff": 157.6653000108845
+      }
+    },
+    "paths": {
+      "input": "D:\\Dowload\\Giáo trình\\Kì 1 năm 4\\Xử lý ảnh\\Bài tập lớn\\BTL\\artifacts\\course_images\\blobs_input.png",
+      "binary_mask": "D:\\Dowload\\Giáo trình\\Kì 1 năm 4\\Xử lý ảnh\\Bài tập lớn\\BTL\\artifacts\\course_images\\blobs_binary_mask.png",
+      "distance_map": "D:\\Dowload\\Giáo trình\\Kì 1 năm 4\\Xử lý ảnh\\Bài tập lớn\\BTL\\artifacts\\course_images\\blobs_distance_map.png",
+      "markers": "D:\\Dowload\\Giáo trình\\Kì 1 năm 4\\Xử lý ảnh\\Bài tập lớn\\BTL\\artifacts\\course_images\\blobs_markers.png",
+      "labels": "D:\\Dowload\\Giáo trình\\Kì 1 năm 4\\Xử lý ảnh\\Bài tập lớn\\BTL\\artifacts\\course_images\\blobs_labels.png",
+      "overlay": "D:\\Dowload\\Giáo trình\\Kì 1 năm 4\\Xử lý ảnh\\Bài tập lớn\\BTL\\artifacts\\course_images\\blobs_overlay.png",
+      "cc_overlay": "D:\\Dowload\\Giáo trình\\Kì 1 năm 4\\Xử lý ảnh\\Bài tập lớn\\BTL\\artifacts\\course_images\\blobs_cc_overlay.png"
+    }
+  },
+  "polymersomes": {
+    "name": "Fig1039(a)(polymersomes).tif",
+    "description": "Túi tế bào polymersomes chụp hiển vi huỳnh quang (Gonzalez & Woods Ch10)",
+    "stats": {
+      "num_connected_components": 6,
+      "num_watershed_objects": 13,
+      "num_markers": 13,
+      "cc_runtime_seconds": 0.0022094999985711183,
+      "ws_runtime_seconds": 0.05896910000228672,
+      "parameters": {
+        "sigma": 1.5,
+        "radius": 2,
+        "peak_fraction": 0.25,
+        "cutoff": 153.7535732675199
+      }
+    },
+    "paths": {
+      "input": "D:\\Dowload\\Giáo trình\\Kì 1 năm 4\\Xử lý ảnh\\Bài tập lớn\\BTL\\artifacts\\course_images\\polymersomes_input.png",
+      "binary_mask": "D:\\Dowload\\Giáo trình\\Kì 1 năm 4\\Xử lý ảnh\\Bài tập lớn\\BTL\\artifacts\\course_images\\polymersomes_binary_mask.png",
+      "distance_map": "D:\\Dowload\\Giáo trình\\Kì 1 năm 4\\Xử lý ảnh\\Bài tập lớn\\BTL\\artifacts\\course_images\\polymersomes_distance_map.png",
+      "markers": "D:\\Dowload\\Giáo trình\\Kì 1 năm 4\\Xử lý ảnh\\Bài tập lớn\\BTL\\artifacts\\course_images\\polymersomes_markers.png",
+      "labels": "D:\\Dowload\\Giáo trình\\Kì 1 năm 4\\Xử lý ảnh\\Bài tập lớn\\BTL\\artifacts\\course_images\\polymersomes_labels.png",
+      "overlay": "D:\\Dowload\\Giáo trình\\Kì 1 năm 4\\Xử lý ảnh\\Bài tập lớn\\BTL\\artifacts\\course_images\\polymersomes_overlay.png",
+      "cc_overlay": "D:\\Dowload\\Giáo trình\\Kì 1 năm 4\\Xử lý ảnh\\Bài tập lớn\\BTL\\artifacts\\course_images\\polymersomes_cc_overlay.png"
+    }
+  },
+  "dowels": {
+    "name": "Fig0941(a)(wood_dowels).tif",
+    "description": "Tiết diện các thanh gỗ tròn tiếp xúc nhau (Gonzalez & Woods Ch09)",
+    "stats": {
+      "num_connected_components": 30,
+      "num_watershed_objects": 48,
+      "num_markers": 48,
+      "cc_runtime_seconds": 0.0021422999998321757,
+      "ws_runtime_seconds": 0.059193500001128996,
+      "parameters": {
+        "sigma": 1.5,
+        "radius": 2,
+        "peak_fraction": 0.4,
+        "cutoff": 118.22129052351518
+      }
+    },
+    "paths": {
+      "input": "D:\\Dowload\\Giáo trình\\Kì 1 năm 4\\Xử lý ảnh\\Bài tập lớn\\BTL\\artifacts\\course_images\\dowels_input.png",
+      "binary_mask": "D:\\Dowload\\Giáo trình\\Kì 1 năm 4\\Xử lý ảnh\\Bài tập lớn\\BTL\\artifacts\\course_images\\dowels_binary_mask.png",
+      "distance_map": "D:\\Dowload\\Giáo trình\\Kì 1 năm 4\\Xử lý ảnh\\Bài tập lớn\\BTL\\artifacts\\course_images\\dowels_distance_map.png",
+      "markers": "D:\\Dowload\\Giáo trình\\Kì 1 năm 4\\Xử lý ảnh\\Bài tập lớn\\BTL\\artifacts\\course_images\\dowels_markers.png",
+      "labels": "D:\\Dowload\\Giáo trình\\Kì 1 năm 4\\Xử lý ảnh\\Bài tập lớn\\BTL\\artifacts\\course_images\\dowels_labels.png",
+      "overlay": "D:\\Dowload\\Giáo trình\\Kì 1 năm 4\\Xử lý ảnh\\Bài tập lớn\\BTL\\artifacts\\course_images\\dowels_overlay.png",
+      "cc_overlay": "D:\\Dowload\\Giáo trình\\Kì 1 năm 4\\Xử lý ảnh\\Bài tập lớn\\BTL\\artifacts\\course_images\\dowels_cc_overlay.png"
+    }
+  }
+}
