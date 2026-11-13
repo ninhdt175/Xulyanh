@@ -27,7 +27,7 @@ from docx.shared import Cm, Pt, RGBColor
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 FONT_NAME = "Times New Roman"
-BODY_SIZE = Pt(14)
+BODY_SIZE = Pt(13)
 ACCENT = "17365D"
 LIGHT_BLUE = "EAF2F8"
 LIGHT_GRAY = "D9D9D9"
@@ -84,17 +84,13 @@ def set_cell_margins(cell, top=100, start=120, bottom=100, end=120) -> None:
 
 
 def set_table_fixed_layout(table) -> None:
-    """Enforce fixed column widths and prevent table width recalculation."""
-    tbl_pr = table._tbl.tblPr
-    tbl_layout = tbl_pr.first_child_found_in("w:tblLayout")
-    if tbl_layout is None:
-        tbl_layout = OxmlElement("w:tblLayout")
-        tbl_pr.append(tbl_layout)
-    tbl_layout.set(qn("w:type"), "fixed")
+    """Enforce fixed column widths without duplicating w:tblLayout in tblPr."""
+    table.style = "Table Grid"
+    table.autofit = False
 
 
 def set_table_borders(table, shadow: bool = True) -> None:
-    """Configure single table borders with Color: Automatic and Word shadow effect."""
+    """Configure single table borders with Color: Automatic and Word shadow effect per global rule."""
     tbl_pr = table._tbl.tblPr
     borders = tbl_pr.first_child_found_in("w:tblBorders")
     if borders is None:
@@ -106,11 +102,13 @@ def set_table_borders(table, shadow: bool = True) -> None:
             tag = OxmlElement(f"w:{edge}")
             borders.append(tag)
         tag.set(qn("w:val"), "single")
-        tag.set(qn("w:sz"), "6" if edge in ("top", "bottom", "left", "right") else "4")
         tag.set(qn("w:space"), "0")
         tag.set(qn("w:color"), "auto")
         if shadow and edge in ("bottom", "right"):
+            tag.set(qn("w:sz"), "12")
             tag.set(qn("w:shadow"), "1")
+        else:
+            tag.set(qn("w:sz"), "4")
 
 
 def prevent_row_split(row) -> None:
@@ -210,10 +208,9 @@ def add_cover(doc: Document) -> None:
         ["4", "B23DCCN940", "Cao Xuân Vũ"],
     ]
     table = doc.add_table(rows=1, cols=3)
-    table.alignment = WD_TABLE_ALIGNMENT.CENTER
-    table.autofit = False
     set_table_fixed_layout(table)
-    widths = (Cm(1.3), Cm(4.2), Cm(7.0))
+    table.alignment = WD_TABLE_ALIGNMENT.CENTER
+    widths = (Cm(1.5), Cm(5.0), Cm(9.7))
     for idx, width in enumerate(widths):
         table.columns[idx].width = width
     for idx, text in enumerate(("STT", "Mã sinh viên", "Họ và tên")):
@@ -232,15 +229,14 @@ def add_cover(doc: Document) -> None:
             cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
             set_cell_margins(cell)
             if row_idx == 0:
-                set_cell_shading(cell, ACCENT)
+                set_cell_shading(cell, LIGHT_GRAY)
             for paragraph in cell.paragraphs:
                 paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER if idx < 2 else WD_ALIGN_PARAGRAPH.LEFT
                 paragraph.paragraph_format.first_line_indent = Cm(0)
                 paragraph.paragraph_format.left_indent = Cm(0)
                 for run in paragraph.runs:
                     set_run_font(run, Pt(13), bold=row_idx == 0)
-                    if row_idx == 0:
-                        run.font.color.rgb = RGBColor(255, 255, 255)
+                    run.font.color.rgb = RGBColor(0, 0, 0)
 
     doc.add_paragraph().paragraph_format.space_after = Pt(12)
     instructor = doc.add_paragraph()
@@ -257,13 +253,13 @@ def add_heading(doc: Document, text: str, level: int = 1, *, page_break: bool = 
     if page_break:
         doc.add_page_break()
     paragraph = doc.add_heading(text, level=level)
-    paragraph.alignment = WD_ALIGN_PARAGRAPH.LEFT
+    paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER if level == 1 else WD_ALIGN_PARAGRAPH.LEFT
     paragraph.paragraph_format.space_before = Pt(12 if level == 1 else (8 if level == 2 else 6))
     paragraph.paragraph_format.space_after = Pt(6)
     paragraph.paragraph_format.keep_with_next = True
-    size_map = {1: Pt(16), 2: Pt(15), 3: Pt(14)}
+    size_map = {1: Pt(14), 2: Pt(13), 3: Pt(13)}
     for run in paragraph.runs:
-        set_run_font(run, size_map.get(level, Pt(14)), bold=True)
+        set_run_font(run, size_map.get(level, Pt(13)), bold=True)
     return paragraph
 
 
@@ -280,7 +276,7 @@ def add_figure(doc: Document, image_path: Path, caption: str, width_cm: float = 
     caption_paragraph = doc.add_paragraph()
     caption_paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
     caption_paragraph.paragraph_format.space_after = Pt(9)
-    set_run_font(caption_paragraph.add_run(caption), Pt(12), italic=True)
+    set_run_font(caption_paragraph.add_run(caption), Pt(11), italic=True)
 
 
 def add_metric_table(
@@ -292,12 +288,11 @@ def add_metric_table(
 ) -> None:
     """Add a consistently styled, readable metrics or comparison table with caption below."""
     table = doc.add_table(rows=1, cols=len(headers))
-    table.alignment = WD_TABLE_ALIGNMENT.CENTER
-    table.autofit = False
     set_table_fixed_layout(table)
+    table.alignment = WD_TABLE_ALIGNMENT.CENTER
     table.rows[0]._tr.get_or_add_trPr().append(OxmlElement("w:tblHeader"))
     if widths_cm is None:
-        widths_cm = [15.0 / len(headers)] * len(headers)
+        widths_cm = [16.2 / len(headers)] * len(headers)
     for idx, width in enumerate(widths_cm):
         table.columns[idx].width = Cm(width)
     for idx, header in enumerate(headers):
@@ -318,39 +313,38 @@ def add_metric_table(
             cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
             set_cell_margins(cell)
             if row_idx == 0:
-                set_cell_shading(cell, ACCENT)
-            elif row_idx % 2 == 0:
-                set_cell_shading(cell, LIGHT_BLUE)
+                set_cell_shading(cell, LIGHT_GRAY)
             for paragraph in cell.paragraphs:
-                paragraph.alignment = WD_ALIGN_PARAGRAPH.LEFT if col_idx == 0 else WD_ALIGN_PARAGRAPH.CENTER
+                paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER if col_idx > 0 or row_idx == 0 else WD_ALIGN_PARAGRAPH.LEFT
                 paragraph.paragraph_format.first_line_indent = Cm(0)
                 paragraph.paragraph_format.left_indent = Cm(0)
                 paragraph.paragraph_format.space_after = Pt(0)
-                paragraph.paragraph_format.line_spacing = 1.1
+                paragraph.paragraph_format.line_spacing = 1.15
                 for run in paragraph.runs:
                     set_run_font(run, Pt(11), bold=row_idx == 0)
-                    if row_idx == 0:
-                        run.font.color.rgb = RGBColor(255, 255, 255)
+                    run.font.color.rgb = RGBColor(0, 0, 0)
 
     caption = doc.add_paragraph()
     caption.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    caption.paragraph_format.space_before = Pt(4)
-    caption.paragraph_format.space_after = Pt(9)
-    set_run_font(caption.add_run(title), Pt(12), italic=True)
+    caption.paragraph_format.space_before = Pt(3)
+    caption.paragraph_format.space_after = Pt(10)
+    set_run_font(caption.add_run(title), Pt(11), bold=True)
 
 
-def add_code_block(doc: Document, code: str, title: str | None = None, width_cm: float = 16.0) -> None:
+def add_code_block(doc: Document, code: str, title: str | None = None, width_cm: float = 16.2) -> None:
     """Render a formatted, monospaced code snippet inside a shaded single-cell container."""
+    from docx.enum.table import WD_ROW_HEIGHT_RULE
     table = doc.add_table(rows=1, cols=1)
-    table.alignment = WD_TABLE_ALIGNMENT.CENTER
-    table.autofit = False
     set_table_fixed_layout(table)
+    table.alignment = WD_TABLE_ALIGNMENT.CENTER
     table.columns[0].width = Cm(width_cm)
+    table.rows[0].height_rule = WD_ROW_HEIGHT_RULE.AT_LEAST
+    table.rows[0].height = Cm(1.0)
 
     cell = table.cell(0, 0)
     cell.width = Cm(width_cm)
     set_cell_shading(cell, CODE_BG)
-    set_cell_margins(cell, top=140, start=180, bottom=140, end=180)
+    set_cell_margins(cell, top=120, start=160, bottom=120, end=160)
     set_table_borders(table, shadow=True)
     prevent_row_split(table.rows[0])
 
@@ -370,9 +364,9 @@ def add_code_block(doc: Document, code: str, title: str | None = None, width_cm:
     if title:
         caption = doc.add_paragraph()
         caption.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        caption.paragraph_format.space_before = Pt(4)
-        caption.paragraph_format.space_after = Pt(9)
-        set_run_font(caption.add_run(title), Pt(11), italic=True)
+        caption.paragraph_format.space_before = Pt(3)
+        caption.paragraph_format.space_after = Pt(10)
+        set_run_font(caption.add_run(title), Pt(11), bold=True)
 
 
 def add_page_number_field(section) -> None:
@@ -520,7 +514,7 @@ def configure_document(doc: Document) -> None:
         style._element.rPr.rFonts.set(qn("w:hAnsi"), FONT_NAME)
         style._element.rPr.rFonts.set(qn("w:eastAsia"), FONT_NAME)
         style._element.rPr.rFonts.set(qn("w:cs"), FONT_NAME)
-        style.font.size = Pt(16 if level == 1 else (15 if level == 2 else 14))
+        style.font.size = Pt(14 if level == 1 else 13)
         style.font.bold = True
         style.font.color.rgb = RGBColor(0, 0, 0)
 
@@ -587,10 +581,10 @@ def build_report(artifacts: Path, output: Path) -> None:
     main = doc.add_section(WD_SECTION.NEW_PAGE)
     main.page_width = Cm(21.0)
     main.page_height = Cm(29.7)
-    main.top_margin = Cm(3.0)
-    main.bottom_margin = Cm(3.0)
+    main.top_margin = Cm(2.0)
+    main.bottom_margin = Cm(2.0)
     main.left_margin = Cm(3.0)
-    main.right_margin = Cm(2.0)
+    main.right_margin = Cm(1.8)
     main.header_distance = Cm(1.2)
     main.footer_distance = Cm(1.2)
     add_page_number_field(main)
@@ -619,7 +613,7 @@ def build_report(artifacts: Path, output: Path) -> None:
     add_heading(doc, "1.3 Thành viên và phân công", 2)
     add_metric_table(
         doc,
-        "Bảng 1 Phân công nhóm 1",
+        "Bảng 1.1 Phân công nhiệm vụ thực hiện bài tập lớn nhóm 1",
         ["Thành viên", "Mã sinh viên", "Nhiệm vụ chính"],
         [
             ["Đinh Viết Huy", "B23DCCN381", "Lý thuyết, tài liệu, mô hình toán học"],
@@ -627,7 +621,7 @@ def build_report(artifacts: Path, output: Path) -> None:
             ["Nguyễn Tuấn Tài", "B23DCCN731", "Workflow Fiji, macro và MorphoLibJ"],
             ["Cao Xuân Vũ", "B23DCCN940", "Dữ liệu, ground truth, metric và biểu đồ"],
         ],
-        [4.0, 3.2, 7.8],
+        [4.2, 3.8, 8.2],
     )
 
     add_heading(doc, "CHƯƠNG 2: CƠ SỞ HÌNH THÁI HỌC TOÁN HỌC", page_break=True)
@@ -750,7 +744,7 @@ def build_report(artifacts: Path, output: Path) -> None:
     add_heading(doc, "5.2 Quy trình tham chiếu", 2)
     add_metric_table(
         doc,
-        "Bảng 2 Ánh xạ tham số Python và Fiji",
+        "Bảng 5.1 Ánh xạ tham số tương đương giữa Python và Fiji",
         ["Bước", "Python", "Fiji hoặc MorphoLibJ"],
         [
             ["Làm trơn", "Gaussian σ = 1,0", "Process Filters Gaussian Blur, radius 1,0"],
@@ -760,7 +754,7 @@ def build_report(artifacts: Path, output: Path) -> None:
             ["Phân đoạn", "watershed(−D, M, mask)", "MorphoLibJ Marker-Controlled Watershed"],
             ["Đầu ra", "PNG, CSV, nhãn int32", "Binary, labels và Results CSV"],
         ],
-        [3.0, 5.2, 6.8],
+        [3.2, 5.8, 7.2],
     )
     add_body_paragraph(
         doc,
@@ -817,11 +811,11 @@ def build_report(artifacts: Path, output: Path) -> None:
     add_heading(doc, "6.3 Tham số mặc định và cấu hình thí nghiệm", 2)
     add_body_paragraph(
         doc,
-        "Nhằm đảm bảo tính khách quan và khả năng so sánh định lượng xuyên suốt giữa các lần chạy, toàn bộ tham số của pipeline phân đoạn và môi trường thực nghiệm được cố định trong Bảng 3.",
+        "Nhằm đảm bảo tính khách quan và khả năng so sánh định lượng xuyên suốt giữa các lần chạy, toàn bộ tham số của pipeline phân đoạn và môi trường thực nghiệm được cố định trong Bảng 6.1.",
     )
     add_metric_table(
         doc,
-        "Bảng 3 Cấu hình tham số mặc định và thiết lập thí nghiệm",
+        "Bảng 6.1 Cấu hình tham số mặc định và thiết lập thí nghiệm",
         ["Tham số", "Giá trị", "Ý nghĩa và vai trò trong thuật toán"],
         [
             ["Kích thước ảnh đầu vào", "512 × 512 pixel", "Độ phân giải chuẩn cho ảnh hiển vi tổng hợp"],
@@ -834,7 +828,7 @@ def build_report(artifacts: Path, output: Path) -> None:
             ["Không gian kết nối lân cận", "8-connectivity (2D)", "Định nghĩa tính liên thông của các thành phần và đường lưu vực"],
             ["Tập hạt giống ngẫu nhiên", "381, 633, 731, 940, 101", "5 lần lặp độc lập kiểm tra độ ổn định thống kê"],
         ],
-        [4.2, 3.8, 7.0],
+        [4.5, 4.2, 7.5],
     )
 
     add_heading(doc, "6.4 Các chiến lược và kỹ thuật tối ưu hóa chương trình", 2)
@@ -883,11 +877,11 @@ def build_report(artifacts: Path, output: Path) -> None:
     add_heading(doc, "6.4.4 Phân tích độ phức tạp thời gian và không gian", 3)
     add_body_paragraph(
         doc,
-        "Bảng 4 tổng hợp phân tích lý thuyết và thực nghiệm về độ phức tạp thời gian, không gian bộ nhớ của từng công đoạn trong toàn bộ pipeline phân đoạn ảnh (với N = H × W là tổng số điểm ảnh, k là kích thước footprint hình thái, và M là số thành phần liên thông).",
+        "Bảng 6.2 tổng hợp phân tích lý thuyết và thực nghiệm về độ phức tạp thời gian, không gian bộ nhớ của từng công đoạn trong toàn bộ pipeline phân đoạn ảnh (với N = H × W là tổng số điểm ảnh, k là kích thước footprint hình thái, và M là số thành phần liên thông).",
     )
     add_metric_table(
         doc,
-        "Bảng 4 Phân tích độ phức tạp thời gian và không gian của các giai đoạn trong pipeline",
+        "Bảng 6.2 Phân tích độ phức tạp thời gian và không gian của các giai đoạn trong pipeline",
         ["Công đoạn xử lý", "Thuật toán / Hàm cốt lõi", "Độ phức tạp thời gian", "Độ phức tạp bộ nhớ", "Thời gian đo (ảnh 512×512)"],
         [
             ["1. Phát sinh ảnh tổng hợp", "NumPy vector broadcasting", "O(M · (H + W))", "O(N) (uint8 + int32)", "≈ 0,0065 s"],
@@ -899,7 +893,7 @@ def build_report(artifacts: Path, output: Path) -> None:
             ["7. Phân đoạn Watershed", "skimage.segmentation.watershed", "O(N log N) (Meyer C-queue)", "O(N) (int32)", "≈ 0,0315 s"],
             ["8. Trực quan hóa RGB Overlay", "skimage.color.label2rgb", "O(N)", "O(3·N) (uint8)", "≈ 0,0085 s"],
         ],
-        [3.6, 4.0, 2.8, 2.6, 2.0],
+        [3.8, 4.2, 3.0, 2.8, 2.4],
     )
     add_body_paragraph(
         doc,
@@ -909,7 +903,7 @@ def build_report(artifacts: Path, output: Path) -> None:
     add_heading(doc, "6.5 Hệ thống kiểm thử tự động và đảm bảo chất lượng", 2)
     add_body_paragraph(
         doc,
-        "Đảm bảo chất lượng phần mềm và tính đúng đắn toán học là một phần trọng tâm trong nhiệm vụ của Thành viên 2. Dự án đã xây dựng bộ kiểm thử tự động hoàn chỉnh dựa trên framework pytest chuẩn công nghiệp với 18 ca kiểm thử (test cases) độc lập, bao phủ toàn diện từ toán học hình thái, trường hợp biên của metric, tính toàn vẹn của pipeline cho đến giao diện dòng lệnh (CLI). Toàn bộ 18/18 test cases đều vượt qua thành công 100% (PASS) với thời gian thực thi xấp xỉ 12,6 giây.",
+        "Đảm bảo chất lượng phần mềm và tính đúng đắn toán học là một phần trọng tâm trong nhiệm vụ của Thành viên 2. Dự án đã xây dựng bộ kiểm thử tự động hoàn chỉnh dựa trên framework pytest chuẩn công nghiệp với 18 ca kiểm thử (test cases) độc lập, bao phủ toàn diện từ toán học hình thái, trường hợp biên của metric, tính toàn vẹn của pipeline cho đến giao diện dòng lệnh (CLI). Toàn bộ 18/18 test cases đều vượt qua thành công 100% (PASS) với thời gian thực thi xấp xỉ 12,6 giây, được tổng hợp chi tiết trong Bảng 6.3.",
     )
     add_body_paragraph(
         doc,
@@ -926,7 +920,7 @@ def build_report(artifacts: Path, output: Path) -> None:
 
     add_metric_table(
         doc,
-        "Bảng 5 Tổng hợp kết quả thực thi bộ kiểm thử tự động pytest",
+        "Bảng 6.3 Tổng hợp kết quả thực thi bộ kiểm thử tự động pytest",
         ["Tên Test Suite", "Mục tiêu kiểm thử trọng tâm", "Số lượng test", "Trạng thái", "Tỷ lệ đạt", "Thời gian"],
         [
             ["tests/test_synthetic.py", "Tính tất định và khả năng tái lập qua hạt giống ngẫu nhiên", "1 test", "PASSED", "100%", "≈ 0,42 s"],
@@ -936,7 +930,7 @@ def build_report(artifacts: Path, output: Path) -> None:
             ["tests/test_run_real_image.py", "Giao diện CLI, lưu trữ siêu dữ liệu và cơ chế fallback", "3 tests", "PASSED", "100%", "≈ 6,54 s"],
             ["Tổng cộng toàn bộ suite", "Đảm bảo chất lượng toàn diện cho thuật toán và hệ thống", "18 tests", "PASSED", "100%", "12,61 s"],
         ],
-        [3.8, 4.6, 1.8, 1.6, 1.6, 1.6],
+        [4.0, 5.0, 2.0, 1.8, 1.7, 1.7],
     )
 
     add_heading(doc, "6.6 Mã nguồn Python cốt lõi của các toán tử hình thái và pipeline", 2)
@@ -981,7 +975,7 @@ def build_report(artifacts: Path, output: Path) -> None:
         '    markers, _ = ndi.label(peaks)\n'
         '    return distance_map, markers.astype(np.int32, copy=False)'
     )
-    add_code_block(doc, code_morphology, "Đoạn mã 1 Cài đặt các toán tử hình thái học nhị phân và trích xuất marker (src/watershed_btl/morphology.py)")
+    add_code_block(doc, code_morphology, "Đoạn mã 6.1 Cài đặt các toán tử hình thái học nhị phân và trích xuất marker (src/watershed_btl/morphology.py)")
 
     code_pipeline = (
         'from dataclasses import dataclass\n'
@@ -1009,7 +1003,7 @@ def build_report(artifacts: Path, output: Path) -> None:
         '    overlay = label2rgb(labels, image=source, bg_label=0, kind="overlay")\n'
         '    return SegmentationResult(binary_mask=binary_mask, distance_map=distance_map, markers=markers, labels=labels, overlay=overlay)'
     )
-    add_code_block(doc, code_pipeline, "Đoạn mã 2 Pipeline phân đoạn Marker-controlled Watershed và cấu trúc kết quả (src/watershed_btl/pipeline.py)")
+    add_code_block(doc, code_pipeline, "Đoạn mã 6.2 Pipeline phân đoạn Marker-controlled Watershed và cấu trúc kết quả (src/watershed_btl/pipeline.py)")
 
     code_synthetic = (
         'import numpy as np\n'
@@ -1040,7 +1034,7 @@ def build_report(artifacts: Path, output: Path) -> None:
         '    image = np.clip(intensities, 0, 255).astype(np.uint8)\n'
         '    return SyntheticSample(image=image, instance_labels=labels)'
     )
-    add_code_block(doc, code_synthetic, "Đoạn mã 3 Cơ chế sinh dữ liệu tổng hợp xác định qua seed với vectorization (src/watershed_btl/synthetic.py)")
+    add_code_block(doc, code_synthetic, "Đoạn mã 6.3 Cơ chế sinh dữ liệu tổng hợp xác định qua seed với vectorization (src/watershed_btl/synthetic.py)")
 
     stages = artifacts / "stages"
     add_heading(doc, "CHƯƠNG 7: KẾT QUẢ TRUNG GIAN", page_break=True)
@@ -1085,10 +1079,10 @@ def build_report(artifacts: Path, output: Path) -> None:
     add_heading(doc, "9.1 Trung bình năm seed", 2)
     add_metric_table(
         doc,
-        "Bảng 6 Kết quả trung bình đo từ metrics.csv",
+        "Bảng 9.1 Kết quả định lượng trung bình đo từ metrics.csv trên 5 seeds",
         ["Phương pháp", "IoU", "Dice", "Precision", "Recall", "Số nhãn", "Sai số đếm"],
         mean_rows(metrics),
-        [3.8, 1.65, 1.65, 1.85, 1.65, 1.75, 1.9],
+        [3.6, 2.1, 2.1, 2.1, 2.1, 2.1, 2.1],
     )
     add_figure(doc, artifacts / "summary.png", "Hình 7 Chất lượng mặt nạ và thời gian trung bình đo được", 15.0)
     add_body_paragraph(
@@ -1100,7 +1094,7 @@ def build_report(artifacts: Path, output: Path) -> None:
     full = metrics[metrics["method"] == "full_watershed"].copy()
     add_metric_table(
         doc,
-        "Bảng 7 Watershed đầy đủ trên từng seed",
+        "Bảng 9.2 Chi tiết kết quả Watershed đầy đủ trên từng seed",
         ["Seed", "IoU", "Dice", "Precision", "Recall", "Nhãn dự đoán", "Sai số đếm"],
         [
             [
@@ -1114,7 +1108,7 @@ def build_report(artifacts: Path, output: Path) -> None:
             ]
             for row in full.itertuples()
         ],
-        [1.5, 1.7, 1.7, 1.9, 1.7, 3.0, 2.5],
+        [2.0, 2.4, 2.4, 2.4, 2.4, 2.3, 2.3],
     )
     add_body_paragraph(
         doc,
@@ -1130,7 +1124,7 @@ def build_report(artifacts: Path, output: Path) -> None:
     }
     add_metric_table(
         doc,
-        "Bảng 8 Thời gian đo bằng perf_counter",
+        "Bảng 9.3 Thời gian thực thi đo bằng perf_counter",
         ["Phương pháp", "Trung bình s", "Độ lệch chuẩn s", "Nhỏ nhất s", "Lớn nhất s"],
         [
             [
@@ -1142,7 +1136,7 @@ def build_report(artifacts: Path, output: Path) -> None:
             ]
             for method in ("full_watershed", "no_morphology", "connected_components")
         ],
-        [4.4, 2.65, 2.75, 2.6, 2.6],
+        [4.2, 3.0, 3.0, 3.0, 3.0],
     )
     add_body_paragraph(
         doc,
@@ -1221,10 +1215,10 @@ def build_report(artifacts: Path, output: Path) -> None:
         ]
         add_metric_table(
             doc,
-            "Bảng 9 So sánh năng lực phân đoạn trên tập ảnh giáo trình Gonzalez & Woods",
+            "Bảng 10.1 So sánh năng lực phân đoạn trên tập ảnh giáo trình Gonzalez & Woods",
             course_headers,
             course_rows,
-            widths_cm=[4.4, 2.2, 2.8, 3.4, 3.2],
+            widths_cm=[4.6, 2.4, 2.8, 3.4, 3.0],
         )
 
     add_heading(doc, "CHƯƠNG 11: THẢO LUẬN", page_break=True)
